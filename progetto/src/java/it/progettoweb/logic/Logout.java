@@ -5,7 +5,6 @@
  */
 package it.progettoweb.logic;
 
-import it.progettoweb.data.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,8 +16,29 @@ import javax.servlet.http.HttpSession;
  *
  * @author Luca
  */
-public class Login extends HttpServlet {
+public class Logout extends HttpServlet {
 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            
+        HttpSession session = request.getSession(false);
+        if(session != null){
+            session.invalidate();
+        }
+
+        response.sendRedirect("index.jsp");
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -30,12 +50,9 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("index.jsp");
+        processRequest(request, response);
     }
 
-    
-    
-    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -47,23 +64,9 @@ public class Login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String name = request.getParameter("name");
-        if(name == null){
-            response.sendRedirect("index.jsp");
-        }
-        
-        HttpSession session = request.getSession();
-        User user = new User();
-        user.setName(request.getParameter("name"));
-        session.setAttribute("user", user);
-        session.setAttribute("userType", 1);
-        response.sendRedirect("index.jsp");
-        
+        processRequest(request, response);
     }
 
-    
-    
     /**
      * Returns a short description of the servlet.
      *
@@ -71,7 +74,7 @@ public class Login extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Manages login process";
+        return "Log out";
     }// </editor-fold>
 
 }

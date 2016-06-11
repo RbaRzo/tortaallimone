@@ -5,7 +5,6 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,10 +12,6 @@
         <title>Home</title>
     </head>
     <body>
-        <c:out value="${sessionScope.userType}"/>
-        <c:choose>
-            <c:when test="${sessionScope.userType == 0}"><h3>Anonymous</h3></c:when>
-            <c:otherwise><h3>something wrong</h3></c:otherwise>
-        </c:choose>
+        <%@include file="WEB-INF/navbar.jsp" %>
     </body>
 </html>
