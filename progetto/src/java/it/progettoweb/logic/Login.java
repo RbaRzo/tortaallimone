@@ -6,6 +6,7 @@
 package it.progettoweb.logic;
 
 import it.progettoweb.data.User;
+import it.progettoweb.db.DBManager;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +20,19 @@ import javax.servlet.http.HttpSession;
  */
 public class Login extends HttpServlet {
 
+    private DBManager dbmanager;
+    /**
+     * initialize DBManager attribute
+     * 
+     * @throws ServletException 
+     */
+    @Override
+    public void init() throws ServletException {
+        // initialize dbmanager attribute
+        this.dbmanager = (DBManager)super.getServletContext().getAttribute("dbmanager");
+    }
+    
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -30,6 +44,8 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        //you shouldn't reach this servlet via GET !!!
         response.sendRedirect("index.jsp");
     }
 
@@ -49,16 +65,28 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         
         String name = request.getParameter("name");
-        if(name == null){
+        String password = request.getParameter("password");
+           
+        //if necessary parameters are null, something wrong happened
+        if(name == null || password == null){
             response.sendRedirect("index.jsp");
         }
         
-        HttpSession session = request.getSession();
-        User user = new User();
-        user.setName(request.getParameter("name"));
-        session.setAttribute("user", user);
-        session.setAttribute("userType", 1);
-        response.sendRedirect("index.jsp");
+        //authentiate user
+        User user = dbmanager.authenticate(name, password);
+        
+        if(user == null){
+            //user not present in DB
+            //request.setAttribute("errorCode", 1);
+            //request.getRequestDispatcher("index.jsp").forward(request, response);
+            response.sendRedirect("index.jsp?error=1");
+        }else{
+            //user present in DB. save in session
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            session.setAttribute("userType", user.getUserType());
+            response.sendRedirect("index.jsp");
+        }
         
     }
 
