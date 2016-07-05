@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:useBean id="user" scope="session" class="it.progettoweb.data.User"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -12,6 +13,12 @@
         <title>User</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h3><jsp:getProperty name="user" property="username"/></h3>
+        <p>
+            Name: <jsp:getProperty name="user" property="name"/><br/>
+            Surname: <jsp:getProperty name="user" property="surname"/><br/>
+            Email: <jsp:getProperty name="user" property="email"/><br/>
+
+        </p>
     </body>
 </html>
