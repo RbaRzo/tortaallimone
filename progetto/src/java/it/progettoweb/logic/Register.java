@@ -5,12 +5,17 @@
  */
 package it.progettoweb.logic;
 
+import it.progettoweb.db.DBManager;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.validator.routines.EmailValidator;
+import javax.mail.internet.*;
+import javax.mail.*;
+import java.util.*;
 
 /**
  *
@@ -18,33 +23,19 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Register extends HttpServlet {
 
+    private DBManager dbmanager;
+    
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * initialize DBManager attribute
+     * 
+     * @throws ServletException 
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Register</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Register at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+    @Override
+    public void init() throws ServletException {
+        // initialize dbmanager attribute
+        this.dbmanager = (DBManager)super.getServletContext().getAttribute("dbmanager");
     }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -56,7 +47,9 @@ public class Register extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+        //you shouldn't reach this servlet via GET !!!
+        response.sendRedirect("index.jsp");
     }
 
     /**
@@ -70,7 +63,59 @@ public class Register extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+        //Parameters of the form
+        String name, surname, username, email, emailRep, password, passwordRep, terms;
+        
+        //Rretrieve parameters values
+        name = request.getParameter("name");
+        surname = request.getParameter("surname");
+        username = request.getParameter("username");
+        email = request.getParameter("email");
+        emailRep = request.getParameter("email-rep");
+        password = request.getParameter("password");
+        passwordRep = request.getParameter("password-rep");
+        terms = request.getParameter("terms");
+        
+        //If these parameters are null something went wrong (should never happen!)
+        if(name == null || surname == null || username == null || email == null || emailRep == null || password == null || passwordRep == null){
+            response.sendRedirect("index.jsp");
+        }
+        
+        //Parameters error check (already performed via javascript. Server side control for security reasons).
+        
+        //name
+        if(name.length() < 2 || name.length() > 20){
+            response.sendRedirect("register.jsp?error=1");
+        }
+        
+        //surname
+        if(surname.length() < 2 || surname.length() > 20){
+            response.sendRedirect("register.jsp?error=1");
+        }
+        
+        //name
+        if(username.length() < 3 || username.length() > 20){
+            response.sendRedirect("register.jsp?error=1");
+        }
+        
+        EmailValidator emailValidator = EmailValidator.getInstance(false);
+        
+        boolean result = true;
+        /*
+        try {
+           InternetAddress emailAddr = new InternetAddress(email);
+           emailAddr.validate();
+        } catch (AddressException ex) {
+           result = false;
+        }*/
+        
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("EmailValidator -> "+emailValidator.isValid(email));
+        out.println("InternetAddress ->"+result);
+        out.close();
+        
     }
 
     /**
@@ -80,7 +125,7 @@ public class Register extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+        return "Manages register process";
+    }
 
 }
